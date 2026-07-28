@@ -3,12 +3,28 @@
         "john", "james", "robert", "mary", "william", "david", "richard", "thomas", 
         "sarah", "emily", "michael", "jessica", "emma", "olivia", "daniel", "sophia", 
         "matthew", "charlotte", "joseph", "mia", "alexander", "chloe", "benjamin", 
-        "amelia", "lucas", "harper", "henry", "evelyn", "jackson", "abigail", "sebastian"
+        "amelia", "lucas", "harper", "henry", "evelyn", "jackson", "abigail", "sebastian", 
+        "harper", "jack", "ella", "ryan", "scarlett", "nathan", "victoria", "aaron", 
+        "grace", "isaac", "zoe", "carl", "hannah", "logan", "lily", "caleb", "leah", 
+        "christian", "hazel", "hunter", "stella", "eli", "aurora", "colin", "savannah", 
+        "leo", "audrey", "evan", "brooklyn", "luke", "bella", "jonathan", "claire", 
+        "connor", "skylar", "jeremiah", "lucy", "landon", "paisley", "adrian", "everly", 
+        "jonah", "anna", "gabriel", "caroline", "mason", "nova", "liam", "genesis", 
+        "oliver", "emilia", "elias", "kennedy", "carter", "samantha", "owen", "maya", 
+        "wyatt", "willow", "jayden", "kylie", "gabriel", "naomi", "grayson", "elena"
     ],
     "cognomi": [
         "smith", "johnson", "williams", "brown", "jones", "garcia", "miller", "davis", 
         "rodriguez", "martinez", "taylor", "wilson", "anderson", "thomas", "jackson", 
         "white", "harris", "martin", "clark", "lewis", "walker", "hall", "allen", 
-        "young", "king", "wright", "scott", "torres", "nguyen", "hill", "flores", "green"
+        "young", "king", "wright", "scott", "torres", "nguyen", "hill", "flores", "green", 
+        "adams", "nelson", "baker", "hall", "rivera", "campbell", "mitchell", "carter", 
+        "roberts", "gomez", "phillips", "evans", "turner", "diaz", "parker", "cruz", 
+        "edwards", "collins", "reyes", "stewart", "morris", "morales", "murphy", "cook", 
+        "rogers", "gutierrez", "ortiz", "cooper", "peterson", "bailey", "reed", "kelly", 
+        "howard", "ramos", "kim", "cox", "ward", "richardson", "watson", "brooks", 
+        "chavez", "wood", "james", "bennett", "gray", "mendoza", "ruiz", "hughes", 
+        "price", "alvarez", "castillo", "sanders", "patel", "myers", "long", "ross", 
+        "foster", "jimenez", "powell", "jenkins", "perry", "russell", "sullivan", "bell"
     ]
 }
