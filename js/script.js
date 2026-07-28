@@ -105,15 +105,16 @@ function findRealNames() {
     let inputFreq = getLetterFrequencies(rawInput);
     let inputLength = rawInput.length;
 
-    let nomiFiltrati = listNomi.filter(n => Math.abs(n.length - (inputLength / 2)) <= maxJolly + 4);
-    let cognomiFiltrati = listCognomi.filter(c => Math.abs(c.length - (inputLength / 2)) <= maxJolly + 4);
+    let nomiFiltrati = listNomi.filter(n => Math.abs(n.length - (inputLength / 2)) <= maxJolly + 6);
+    let cognomiFiltrati = listCognomi.filter(c => Math.abs(c.length - (inputLength / 2)) <= maxJolly + 6);
 
     if (nomiFiltrati.length === 0) nomiFiltrati = listNomi;
     if (cognomiFiltrati.length === 0) cognomiFiltrati = listCognomi;
 
     let resultsFound = 0;
     let tentativiFatti = 0;
-    let massimoTentativi = 4000;
+    // Aumentato a 25000 tentativi per fare molti più cicli di ricerca approfondita
+    let massimoTentativi = 25000; 
     let coppieTrovateSet = new Set();
 
     while (resultsFound < numResults && tentativiFatti < massimoTentativi) {
