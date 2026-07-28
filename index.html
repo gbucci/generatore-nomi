@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Generatore Nomi Reali (DB Esterno)</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .container { background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 800px; width: 100%; display: flex; overflow: hidden; }
+        .input-section { padding: 30px; width: 40%; background-color: #ffffff; border-right: 1px solid #e0e0e0; }
+        .results-section { padding: 30px; width: 60%; background-color: #f9fbfb; overflow-y: auto; max-height: 600px; }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0 20px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        
+        /* Stili aggiornati per gestire il pulsante disabilitato durante il caricamento */
+        button { background-color: #4CAF50; color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        button:hover:not(:disabled) { background-color: #45a049; }
+        button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        
+        .generated-name { font-size: 1.4em; font-weight: bold; color: #2c3e50; padding: 10px; margin-bottom: 5px; background-color: white; border: 1px solid #dcdcdc; border-radius: 5px; }
+        .match-details { font-size: 0.85em; color: #666; margin-bottom: 15px; padding-left: 10px; }
+        h2 { margin-top: 0; color: #333; font-size: 1.5em; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="input-section">
+            <h2>Generatore Nomi</h2>
+            
+            <label for="inputStr">Le tue lettere di partenza:</label>
+            <input type="text" id="inputStr" placeholder="Es. Mario Rossi">
+
+            <label for="maxJolly">Jolly massimi (differenze consentite):</label>
+            <input type="number" id="maxJolly" min="0" max="20" value="4">
+
+            <label for="language">Scegli la lingua:</label>
+            <select id="language">
+                <option value="it">Italiano</option>
+                <option value="en">Inglese</option>
+                <option value="mix">Misto (Casuale)</option>
+            </select>
+
+            <label for="numResults">Numero di risultati (1-20):</label>
+            <input type="number" id="numResults" min="1" max="20" value="5">
+
+            <!-- Il pulsante parte disabilitato -->
+            <button id="searchBtn" onclick="findRealNames()" disabled>Caricamento DB in corso...</button>
+        </div>
+
+        <div class="results-section">
+            <h2>Risultati trovati</h2>
+            <div id="result-list">
+                <p style="color: #777;"><em>I risultati appariranno qui...</em></p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // La variabile che conterrà i nostri dati, inizialmente vuota
+        let database = null;
+
+        // --- NUOVA LOGICA: CARICAMENTO DEL DB ESTERNO ---
+        // La parola chiave "async" ci permette di usare "await" all'interno della funzione
+        async function loadDatabase() {
+            const btn = document.getElementById('searchBtn');
+            try {
+                // "fetch" va a leggere il file JSON esterno. "await" mette in pausa il codice finché non finisce.
+                let response = await fetch('nomi.json');
+                
+                // Controlliamo se ci sono stati errori (es. file non trovato)
+                if (!response.ok) {
+                    throw new Error("Impossibile leggere il file JSON.");
+                }
+                
+                // Convertiamo il testo del file in un oggetto JavaScript utilizzabile
+                database = await response.json();
+                
+                // Riattiviamo il pulsante e cambiamo il testo
+                btn.innerText = "Cerca Nomi";
+                btn.disabled = false;
+                
+            } catch (error) {
+                console.error("Errore di caricamento:", error);
+                btn.innerText = "Errore DB (Vedi Console)";
+                document.getElementById('result-list').innerHTML = `<p style="color:red;"><b>Errore critico:</b> Impossibile caricare <code>nomi.json</code>. Se stai usando "file:///", devi avviare un server locale.</p>`;
+            }
+        }
+
+        // Avviamo il caricamento non appena la pagina web ha finito di disegnarsi
+        window.onload = loadDatabase;
+
+
+        // Le funzioni matematiche di supporto (Invariate)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function getLetterFrequencies(str) {
+            let freq = {};
+            for (let char of str) {
+                freq[char] = (freq[char] || 0) + 1;
+            }
+            return freq;
+        }
+
+        function calcolaDifferenze(inputStr, targetStr) {
+            let inputFreq = getLetterFrequencies(inputStr);
+            let targetFreq = getLetterFrequencies(targetStr);
+            
+            let lettereDaAggiungere = 0;
+            let lettereDaTogliere = 0;
+
+            for (let char in targetFreq) {
+                let necessarie = targetFreq[char];
+                let disponibili = inputFreq[char] || 0;
+                if (necessarie > disponibili) lettereDaAggiungere += (necessarie - disponibili);
+            }
+
+            for (let char in inputFreq) {
+                let disponibili = inputFreq[char];
+                let necessarie = targetFreq[char] || 0;
+                if (disponibili > necessarie) lettereDaTogliere += (disponibili - necessarie);
+            }
+
+            return { aggiunte: lettereDaAggiungere, rimozioni: lettereDaTogliere, totale: lettereDaAggiungere + lettereDaTogliere };
+        }
+
+
+        // La logica di ricerca (Leggermente aggiornata per assicurarsi che il DB esista)
+        function findRealNames() {
+            // Blocco di sicurezza: se il DB non è ancora caricato, fermiamo tutto
+            if (!database) {
+                alert("Il database non è ancora pronto!");
+                return;
+            }
+
+            let rawInput = document.getElementById('inputStr').value.toLowerCase().replace(/\s/g, '');
+            let maxJolly = parseInt(document.getElementById('maxJolly').value);
+            let lang = document.getElementById('language').value;
+            let numResults = parseInt(document.getElementById('numResults').value);
+            let resultListDiv = document.getElementById('result-list');
+
+            if (rawInput.length === 0) {
+                alert("Inserisci delle lettere per iniziare.");
+                return;
+            }
+
+            resultListDiv.innerHTML = "";
+
+            let listNomi = [];
+            let listCognomi = [];
+            
+            if (lang === "mix") {
+                listNomi = database.it.nomi.concat(database.en.nomi);
+                listCognomi = database.it.cognomi.concat(database.en.cognomi);
+            } else {
+                listNomi = database[lang].nomi;
+                listCognomi = database[lang].cognomi;
+            }
+
+            let allCombinations = [];
+            for (let n of listNomi) {
+                for (let c of listCognomi) {
+                    allCombinations.push({ nome: n, cognome: c, stringaUnita: n + c });
+                }
+            }
+
+            shuffleArray(allCombinations);
+
+            let resultsFound = 0;
+
+            for (let combo of allCombinations) {
+                if (resultsFound >= numResults) break;
+
+                let differenze = calcolaDifferenze(rawInput, combo.stringaUnita);
+
+                if (differenze.totale <= maxJolly) {
+                    let finalName = combo.nome.charAt(0).toUpperCase() + combo.nome.slice(1);
+                    let finalLastName = combo.cognome.charAt(0).toUpperCase() + combo.cognome.slice(1);
+                    
+                    let nameBox = document.createElement('div');
+                    nameBox.className = 'generated-name';
+                    nameBox.innerText = finalName + " " + finalLastName;
+                    
+                    let detailsBox = document.createElement('div');
+                    detailsBox.className = 'match-details';
+                    detailsBox.innerText = `Jolly usati: ${differenze.totale} (+${differenze.aggiunte} lettere, -${differenze.rimozioni} lettere)`;
+
+                    resultListDiv.appendChild(nameBox);
+                    resultListDiv.appendChild(detailsBox);
+
+                    resultsFound++;
+                }
+            }
+
+            if (resultsFound === 0) {
+                resultListDiv.innerHTML = `<p style='color: orange;'>Nessun nome trovato con questi parametri.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

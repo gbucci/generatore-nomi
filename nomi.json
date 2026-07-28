@@ -1,0 +1,10 @@
+{
+    "it": {
+        "nomi": ["mario", "luigi", "gabriele", "luca", "anna", "giulia", "paolo", "chiara", "marco", "elena", "roberto", "silvia", "andrea", "valentina", "francesco", "sara"],
+        "cognomi": ["rossi", "bianchi", "bucci", "verdi", "esposito", "ricci", "romano", "colombo", "gallo", "conti", "costa", "fontana", "russo", "ferrari"]
+    },
+    "en": {
+        "nomi": ["john", "james", "robert", "mary", "william", "david", "richard", "thomas", "sarah", "emily", "michael", "jessica", "emma", "olivia"],
+        "cognomi": ["smith", "johnson", "williams", "brown", "jones", "garcia", "miller", "davis", "rodriguez", "martinez", "taylor", "wilson"]
+    }
+}
