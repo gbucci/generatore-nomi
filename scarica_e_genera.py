@@ -21,8 +21,8 @@ def scarica_e_genera_json():
                     parole.append(parola)
                     
         # Estraiamo 5000 parole per i nomi e 5000 per i cognomi
-        nomi = parole[:5000]
-        cognomi = parole[5000:10000] if len(parole) >= 10000 else parole[:5000]
+        nomi = parole[:10000]
+        cognomi = parole[10000:20000] if len(parole) >= 20000 else parole[10000:15000]
         
         # Struttura JSON finale pronta per il progetto
         database_finale = {
