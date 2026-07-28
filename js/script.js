@@ -73,7 +73,8 @@ function calcolaDifferenze(inputFreq, targetStr) {
     return lettereDaAggiungere + lettereDaTogliere;
 }
 
-function findRealNames() {
+// Funzione resa asincrona per permettere l'aggiornamento grafico in tempo reale
+async function findRealNames() {
     if (!database || database.it.nomi.length === 0) {
         alert("Il database non è pronto o non è stato caricato correttamente!");
         return;
@@ -91,6 +92,18 @@ function findRealNames() {
     }
 
     resultListDiv.innerHTML = "";
+
+    // Creiamo o recuperiamo un elemento visivo dedicato per mostrare i tentativi in tempo reale
+    let statusBox = document.getElementById('status-box');
+    if (!statusBox) {
+        statusBox = document.createElement('div');
+        statusBox.id = 'status-box';
+        statusBox.style.margin = '10px 0';
+        statusBox.style.fontStyle = 'italic';
+        statusBox.style.color = '#555';
+        resultListDiv.parentNode.insertBefore(statusBox, resultListDiv);
+    }
+
     let listNomi = [];
     let listCognomi = [];
     
@@ -113,12 +126,17 @@ function findRealNames() {
 
     let resultsFound = 0;
     let tentativiFatti = 0;
-    // Aumentato a 25000 tentativi per fare molti più cicli di ricerca approfondita
-    let massimoTentativi = 25000; 
+    let massimoTentativi = 25000;
     let coppieTrovateSet = new Set();
 
     while (resultsFound < numResults && tentativiFatti < massimoTentativi) {
         tentativiFatti++;
+
+        // Ogni 300 tentativi aggiorniamo la schermata e cediamo il controllo al browser
+        if (tentativiFatti % 300 === 0) {
+            statusBox.innerText = `Tentativi in corso: ${tentativiFatti} / ${massimoTentativi}...`;
+            await new Promise(resolve => setTimeout(resolve, 0));
+        }
 
         let randomNome = nomiFiltrati[Math.floor(Math.random() * nomiFiltrati.length)];
         let randomCognome = cognomiFiltrati[Math.floor(Math.random() * cognomiFiltrati.length)];
@@ -149,7 +167,11 @@ function findRealNames() {
         }
     }
 
-    if (resultsFound === 0) {
-        resultListDiv.innerHTML = `<p style='color: orange;'>Nessun nome trovato con questi parametri. Prova ad aumentare i Jolly o a cambiare input!</p>`;
+    // Aggiorniamo lo stato finale dell'operazione
+    if (resultsFound > 0) {
+        statusBox.innerText = `Ricerca completata in ${tentativiFatti} tentativi. Trovati ${resultsFound} risultati.`;
+    } else {
+        statusBox.innerText = "";
+        resultListDiv.innerHTML = `<p style='color: orange;'>Nessun nome trovato dopo ${tentativiFatti} tentativi. Prova ad aumentare i Jolly o a cambiare input!</p>`;
     }
 }
