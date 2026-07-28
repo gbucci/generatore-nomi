@@ -19,14 +19,6 @@ async function loadDatabase() {
 
 window.onload = loadDatabase;
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
-
 function getLetterFrequencies(str) {
     let freq = {};
     for (let char of str) {
@@ -86,24 +78,37 @@ function findRealNames() {
         listCognomi = database[lang].cognomi;
     }
 
-    let allCombinations = [];
-    for (let n of listNomi) {
-        for (let c of listCognomi) {
-            allCombinations.push({ nome: n, cognome: c, stringaUnita: n + c });
-        }
+    if (listNomi.length === 0 || listCognomi.length === 0) {
+        resultListDiv.innerHTML = `<p style='color: red;'>Il database è vuoto per la lingua selezionata.</p>`;
+        return;
     }
 
-    shuffleArray(allCombinations);
     let resultsFound = 0;
+    let tentativiFatti = 0;
+    let massimoTentativi = 5000; // Sicurezza per evitare cicli infiniti se i jolly sono troppo stretti
+    let coppieTrovateSet = new Set(); // Evita di mostrare lo stesso nome due volte
 
-    for (let combo of allCombinations) {
-        if (resultsFound >= numResults) break;
+    // Algoritmo ottimizzato a campionamento casuale
+    while (resultsFound < numResults && tentativiFatti < massimoTentativi) {
+        tentativiFatti++;
 
-        let differenze = calcolaDifferenze(rawInput, combo.stringaUnita);
+        // Peschiamo un nome e un cognome a caso in modo ultrarapido
+        let randomNome = listNomi[Math.floor(Math.random() * listNomi.length)];
+        let randomCognome = listCognomi[Math.floor(Math.random() * listCognomi.length)];
+        let stringaUnita = randomNome + randomCognome;
+
+        let chiaveUnica = randomNome + "_" + randomCognome;
+        if (coppieTrovateSet.has(chiaveUnica)) continue; // Salta se l'abbiamo già generato in questo giro
+
+        // Calcoliamo la distanza
+        let differenze = calcolaDifferenze(rawInput, stringaUnita);
 
         if (differenze.totale <= maxJolly) {
-            let finalName = combo.nome.charAt(0).toUpperCase() + combo.nome.slice(1);
-            let finalLastName = combo.cognome.charAt(0).toUpperCase() + combo.cognome.slice(1);
+            coppieTrovateSet.add(chiaveUnica);
+            resultsFound++;
+
+            let finalName = randomNome.charAt(0).toUpperCase() + randomNome.slice(1);
+            let finalLastName = randomCognome.charAt(0).toUpperCase() + randomCognome.slice(1);
             
             let nameBox = document.createElement('div');
             nameBox.className = 'generated-name';
@@ -115,10 +120,13 @@ function findRealNames() {
 
             resultListDiv.appendChild(nameBox);
             resultListDiv.appendChild(detailsBox);
-
-            resultsFound++;
         }
     }
+
+    if (resultsFound === 0) {
+        resultListDiv.innerHTML = `<p style='color: orange;'>Nessun nome trovato con questi parametri. Prova ad aumentare i Jolly o a cambiare input!</p>`;
+    }
+}
 
     if (resultsFound === 0) {
         resultListDiv.innerHTML = `<p style='color: orange;'>Nessun nome trovato con questi parametri.</p>`;
