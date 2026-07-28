@@ -1,0 +1,14 @@
+{
+    "nomi": [
+        "john", "james", "robert", "mary", "william", "david", "richard", "thomas", 
+        "sarah", "emily", "michael", "jessica", "emma", "olivia", "daniel", "sophia", 
+        "matthew", "charlotte", "joseph", "mia", "alexander", "chloe", "benjamin", 
+        "amelia", "lucas", "harper", "henry", "evelyn", "jackson", "abigail", "sebastian"
+    ],
+    "cognomi": [
+        "smith", "johnson", "williams", "brown", "jones", "garcia", "miller", "davis", 
+        "rodriguez", "martinez", "taylor", "wilson", "anderson", "thomas", "jackson", 
+        "white", "harris", "martin", "clark", "lewis", "walker", "hall", "allen", 
+        "young", "king", "wright", "scott", "torres", "nguyen", "hill", "flores", "green"
+    ]
+}
