@@ -6,6 +6,8 @@ let database = {
 // Caricamento asincrono multiplo dei file JSON
 async function loadDatabase() {
     const btn = document.getElementById('searchBtn');
+    const resultListDiv = document.getElementById('result-list');
+
     try {
         let [resIt, resEn] = await Promise.all([
             fetch('nomi_it.json'),
@@ -13,7 +15,7 @@ async function loadDatabase() {
         ]);
 
         if (!resIt.ok || !resEn.ok) {
-            throw new Error("Impossibile leggere uno o più file JSON.");
+            throw new Error(`Errore HTTP! File non trovati (Status: ${resIt.status} / ${resEn.status})`);
         }
 
         database.it = await resIt.json();
@@ -21,16 +23,23 @@ async function loadDatabase() {
 
         btn.innerText = "Cerca Nomi";
         btn.disabled = false;
+        resultListDiv.innerHTML = `<p style="color: #777;"><em>Database caricato con successo! Inserisci le lettere.</em></p>`;
+
     } catch (error) {
-        console.error("Errore di caricamento:", error);
-        btn.innerText = "Errore DB (Vedi Console)";
-        document.getElementById('result-list').innerHTML = `<p style="color:red;"><b>Errore critico:</b> Impossibile caricare i file JSON.</p>`;
+        console.error("Errore di caricamento del database:", error);
+        btn.innerText = "Errore di caricamento DB";
+        btn.disabled = true;
+        resultListDiv.innerHTML = `
+            <div style="color: red; background: #ffe6e6; padding: 15px; border-radius: 5px;">
+                <b>Errore critico di caricamento:</b><br>
+                Impossibile trovare o leggere i file <code>nomi_it.json</code> o <code>nomi_en.json</code> nella cartella principale.
+            </div>
+        `;
     }
 }
 
 window.onload = loadDatabase;
 
-// Funzione rapida per contare le frequenze delle lettere
 function getLetterFrequencies(str) {
     let freq = {};
     for (let i = 0; i < str.length; i++) {
@@ -40,13 +49,11 @@ function getLetterFrequencies(str) {
     return freq;
 }
 
-// Calcolo ottimizzato delle differenze
 function calcolaDifferenze(inputFreq, targetStr) {
     let targetFreq = getLetterFrequencies(targetStr);
     let lettereDaAggiungere = 0;
     let lettereDaTogliere = 0;
 
-    // Controlliamo le lettere necessarie nel target rispetto all'input
     for (let char in targetFreq) {
         let necessarie = targetFreq[char];
         let disponibili = inputFreq[char] || 0;
@@ -55,7 +62,6 @@ function calcolaDifferenze(inputFreq, targetStr) {
         }
     }
 
-    // Controlliamo le lettere in eccesso nell'input rispetto al target
     for (let char in inputFreq) {
         let disponibili = inputFreq[char];
         let necessarie = targetFreq[char] || 0;
@@ -68,8 +74,8 @@ function calcolaDifferenze(inputFreq, targetStr) {
 }
 
 function findRealNames() {
-    if (!database) {
-        alert("Il database non è ancora pronto!");
+    if (!database || database.it.nomi.length === 0) {
+        alert("Il database non è pronto o non è stato caricato correttamente!");
         return;
     }
 
@@ -96,21 +102,12 @@ function findRealNames() {
         listCognomi = database[lang].cognomi;
     }
 
-    if (listNomi.length === 0 || listCognomi.length === 0) {
-        resultListDiv.innerHTML = `<p style='color: red;'>Il database è vuoto per la lingua selezionata.</p>`;
-        return;
-    }
-
-    // Ottimizzazione: pre-calcoliamo la frequenza dell'input una sola volta fuori dal ciclo
     let inputFreq = getLetterFrequencies(rawInput);
     let inputLength = rawInput.length;
 
-    // Filtriamo preventivamente le liste per evitare combinazioni con lunghezze assurde
-    // Teniamo solo i nomi/cognomi la cui lunghezza combinata non si discosta troppo dall'input + jolly
     let nomiFiltrati = listNomi.filter(n => Math.abs(n.length - (inputLength / 2)) <= maxJolly + 4);
     let cognomiFiltrati = listCognomi.filter(c => Math.abs(c.length - (inputLength / 2)) <= maxJolly + 4);
 
-    // Se il filtro è stato troppo restrittivo, usiamo le liste originali come fallback
     if (nomiFiltrati.length === 0) nomiFiltrati = listNomi;
     if (cognomiFiltrati.length === 0) cognomiFiltrati = listCognomi;
 
