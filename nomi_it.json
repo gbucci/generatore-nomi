@@ -1,0 +1,17 @@
+{
+    "nomi": [
+        "mario", "luigi", "gabriele", "luca", "anna", "giulia", "paolo", "chiara", 
+        "marco", "elena", "roberto", "silvia", "andrea", "valentina", "francesco", 
+        "sara", "alessandro", "federica", "davide", "martina", "lorenzo", "elisa", 
+        "matteo", "alessia", "simone", "beatrice", "federico", "caterina", "giovanni", 
+        "aurora", "stefano", "giorgia", "tommaso", "riccardo", "francesca", "filippo", 
+        "giada", "vittorio", "irene", "enrico", "fabio", "alice", "giorgio", "elena"
+    ],
+    "cognomi": [
+        "rossi", "bianchi", "bucci", "verdi", "esposito", "ricci", "romano", "colombo", 
+        "gallo", "conti", "costa", "fontana", "russo", "ferrari", "marino", "greco", 
+        "bruno", "mancini", "lombardi", "de luca", "martini", "giordano", "rizzo", 
+        "lombardo", "moretti", "barbieri", "santoro", "caruso", "ferrara", "galli", 
+        "martelli", "leone", "serra", "parisi", "villa", "fontana", "russo", "bianco"
+    ]
+}
