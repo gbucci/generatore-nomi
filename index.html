@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Generatore Nomi Reali</title>
-    <!-- 
-      AGGIORNAMENTO PERCORSO:
-      Diciamo al browser di entrare nella cartella 'css' prima di caricare il file.
-    -->
+    <!-- Collegamento al file CSS nella cartella css -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <div class="container">
+        <!-- COLONNA DI SINISTRA (Input e Logo) -->
         <div class="input-section">
+            
+            <!-- Logo in formato PNG -->
+            <img src="images/logo.png" alt="Logo del Generatore" style="width: 80px; display: block; margin: 0 auto 15px auto;">
+
             <h2>Generatore Nomi</h2>
             
             <label for="inputStr">Le tue lettere di partenza:</label>
@@ -34,6 +36,7 @@
             <button id="searchBtn" onclick="findRealNames()" disabled>Caricamento DB in corso...</button>
         </div>
 
+        <!-- COLONNA DI DESTRA (Risultati) -->
         <div class="results-section">
             <h2>Risultati trovati</h2>
             <div id="result-list">
@@ -42,10 +45,7 @@
         </div>
     </div>
 
-    <!-- 
-      AGGIORNAMENTO PERCORSO:
-      Diciamo al browser di entrare nella cartella 'js' prima di caricare il file.
-    -->
+    <!-- Collegamento al file JavaScript nella cartella js -->
     <script src="js/script.js"></script>
 </body>
 </html>
