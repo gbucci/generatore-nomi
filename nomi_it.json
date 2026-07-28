@@ -5,13 +5,28 @@
         "sara", "alessandro", "federica", "davide", "martina", "lorenzo", "elisa", 
         "matteo", "alessia", "simone", "beatrice", "federico", "caterina", "giovanni", 
         "aurora", "stefano", "giorgia", "tommaso", "riccardo", "francesca", "filippo", 
-        "giada", "vittorio", "irene", "enrico", "fabio", "alice", "giorgio", "elena"
+        "giada", "vittorio", "irene", "enrico", "fabio", "alice", "giorgio", "niccolo",
+        "pietro", "eleonora", "vincenzo", "camilla", "salvatore", "gaia", "antonio", 
+        "gloria", "daniele", "miriam", "christian", "arianna", "emanuele", "viola", 
+        "michele", "greta", "vittoria", "raffaele", "beata", "claudio", "agnese", 
+        "massimo", "noemi", "sera", "fabrizio", "bianca", "vincenza", "serena", 
+        "damiano", "mirko", "giuliano", "valerio", "patrizia", "tiziana", "renato", 
+        "rita", "rosario", "concetta", "carmelo", "giuseppina", "carmela", "alfonso", 
+        "pasquale", "caterina", "teresa", "carmela", "vincenzo", "filomena", "vito", 
+        "assunta", "giuseppe", "francesca", "carmelo", "grazia", "rosaria", "carmelo"
     ],
     "cognomi": [
         "rossi", "bianchi", "bucci", "verdi", "esposito", "ricci", "romano", "colombo", 
         "gallo", "conti", "costa", "fontana", "russo", "ferrari", "marino", "greco", 
         "bruno", "mancini", "lombardi", "de luca", "martini", "giordano", "rizzo", 
         "lombardo", "moretti", "barbieri", "santoro", "caruso", "ferrara", "galli", 
-        "martelli", "leone", "serra", "parisi", "villa", "fontana", "russo", "bianco"
+        "martelli", "leone", "serra", "parisi", "villa", "bianco", "ferri", "ferrante", 
+        "sanna", "pellegrini", "catalano", "sergi", "Messina", "grasso", "cataldo", 
+        "basile", "monti", "parisi", "rigi", "pizz a", "sartori", "riva", "catalano", 
+        "damico", "milani", "rossetti", "farina", "paganini", "vitali", "giuliani", 
+        "testa", "carbone", "sorrentino", "santangelo", "deluca", "palumbo", "ruggieri", 
+        "lazzari", "milano", "durante", "messina", "savino", "pagano", "fiore", 
+        "coppola", "basile", "piazza", "basile", "orlando", "marchetti", "grassi", 
+        "piscopo", "napolitano", "giuliano", "farina", "russo", "ferrari", "romano"
     ]
 }
