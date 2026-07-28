@@ -1,79 +1,3 @@
-let database = {
-    it: { nomi: [], cognomi: [] },
-    en: { nomi: [], cognomi: [] }
-};
-
-// Caricamento asincrono multiplo dei file JSON
-async function loadDatabase() {
-    const btn = document.getElementById('searchBtn');
-    const resultListDiv = document.getElementById('result-list');
-
-    try {
-        let [resIt, resEn] = await Promise.all([
-            fetch('nomi_it.json'),
-            fetch('nomi_en.json')
-        ]);
-
-        if (!resIt.ok || !resEn.ok) {
-            throw new Error(`Errore HTTP! File non trovati (Status: ${resIt.status} / ${resEn.status})`);
-        }
-
-        database.it = await resIt.json();
-        database.en = await resEn.json();
-
-        btn.innerText = "Cerca Nomi";
-        btn.disabled = false;
-        resultListDiv.innerHTML = `<p style="color: #777;"><em>Database caricato con successo! Inserisci le lettere.</em></p>`;
-
-    } catch (error) {
-        console.error("Errore di caricamento del database:", error);
-        btn.innerText = "Errore di caricamento DB";
-        btn.disabled = true;
-        resultListDiv.innerHTML = `
-            <div style="color: red; background: #ffe6e6; padding: 15px; border-radius: 5px;">
-                <b>Errore critico di caricamento:</b><br>
-                Impossibile trovare o leggere i file <code>nomi_it.json</code> o <code>nomi_en.json</code> nella cartella principale.
-            </div>
-        `;
-    }
-}
-
-window.onload = loadDatabase;
-
-function getLetterFrequencies(str) {
-    let freq = {};
-    for (let i = 0; i < str.length; i++) {
-        let char = str[i];
-        freq[char] = (freq[char] || 0) + 1;
-    }
-    return freq;
-}
-
-function calcolaDifferenze(inputFreq, targetStr) {
-    let targetFreq = getLetterFrequencies(targetStr);
-    let lettereDaAggiungere = 0;
-    let lettereDaTogliere = 0;
-
-    for (let char in targetFreq) {
-        let necessarie = targetFreq[char];
-        let disponibili = inputFreq[char] || 0;
-        if (necessarie > disponibili) {
-            lettereDaAggiungere += (necessarie - disponibili);
-        }
-    }
-
-    for (let char in inputFreq) {
-        let disponibili = inputFreq[char];
-        let necessarie = targetFreq[char] || 0;
-        if (disponibili > necessarie) {
-            lettereDaTogliere += (disponibili - necessarie);
-        }
-    }
-
-    return lettereDaAggiungere + lettereDaTogliere;
-}
-
-// Funzione resa asincrona per permettere l'aggiornamento grafico in tempo reale
 async function findRealNames() {
     if (!database || database.it.nomi.length === 0) {
         alert("Il database non è pronto o non è stato caricato correttamente!");
@@ -93,7 +17,7 @@ async function findRealNames() {
 
     resultListDiv.innerHTML = "";
 
-    // Creiamo o recuperiamo un elemento visivo dedicato per mostrare i tentativi in tempo reale
+    // Gestione del box di stato per i tentativi
     let statusBox = document.getElementById('status-box');
     if (!statusBox) {
         statusBox = document.createElement('div');
@@ -103,6 +27,9 @@ async function findRealNames() {
         statusBox.style.color = '#555';
         resultListDiv.parentNode.insertBefore(statusBox, resultListDiv);
     }
+
+    // Mostriamo subito il messaggio iniziale per confermare che la ricerca è partita
+    statusBox.innerText = "Inizializzazione ricerca...";
 
     let listNomi = [];
     let listCognomi = [];
@@ -132,8 +59,8 @@ async function findRealNames() {
     while (resultsFound < numResults && tentativiFatti < massimoTentativi) {
         tentativiFatti++;
 
-        // Ogni 300 tentativi aggiorniamo la schermata e cediamo il controllo al browser
-        if (tentativiFatti % 300 === 0) {
+        // Aggiorniamo il contatore ogni 100 tentativi per una fluidità visiva costante
+        if (tentativiFatti % 100 === 0) {
             statusBox.innerText = `Tentativi in corso: ${tentativiFatti} / ${massimoTentativi}...`;
             await new Promise(resolve => setTimeout(resolve, 0));
         }
@@ -167,7 +94,6 @@ async function findRealNames() {
         }
     }
 
-    // Aggiorniamo lo stato finale dell'operazione
     if (resultsFound > 0) {
         statusBox.innerText = `Ricerca completata in ${tentativiFatti} tentativi. Trovati ${resultsFound} risultati.`;
     } else {
