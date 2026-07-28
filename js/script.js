@@ -1,19 +1,31 @@
-let database = null;
+let database = {
+    it: { nomi: [], cognomi: [] },
+    en: { nomi: [], cognomi: [] }
+};
 
+// Caricamento asincrono multiplo dei file JSON
 async function loadDatabase() {
     const btn = document.getElementById('searchBtn');
     try {
-        let response = await fetch('nomi.json');
-        if (!response.ok) {
-            throw new Error("Impossibile leggere il file JSON.");
+        // Scarichiamo entrambi i file contemporaneamente per la massima velocità
+        let [resIt, resEn] = await Promise.all([
+            fetch('nomi_it.json'),
+            fetch('nomi_en.json')
+        ]);
+
+        if (!resIt.ok || !resEn.ok) {
+            throw new Error("Impossibile leggere uno o più file JSON.");
         }
-        database = await response.json();
+
+        database.it = await resIt.json();
+        database.en = await resEn.json();
+
         btn.innerText = "Cerca Nomi";
         btn.disabled = false;
     } catch (error) {
         console.error("Errore di caricamento:", error);
         btn.innerText = "Errore DB (Vedi Console)";
-        document.getElementById('result-list').innerHTML = `<p style="color:red;"><b>Errore critico:</b> Impossibile caricare <code>nomi.json</code>.</p>`;
+        document.getElementById('result-list').innerHTML = `<p style="color:red;"><b>Errore critico:</b> Impossibile caricare i file JSON.</p>`;
     }
 }
 
@@ -50,11 +62,6 @@ function calcolaDifferenze(inputStr, targetStr) {
 }
 
 function findRealNames() {
-    if (!database) {
-        alert("Il database non è ancora pronto!");
-        return;
-    }
-
     let rawInput = document.getElementById('inputStr').value.toLowerCase().replace(/\s/g, '');
     let maxJolly = parseInt(document.getElementById('maxJolly').value);
     let lang = document.getElementById('language').value;
@@ -85,22 +92,19 @@ function findRealNames() {
 
     let resultsFound = 0;
     let tentativiFatti = 0;
-    let massimoTentativi = 5000; // Sicurezza per evitare cicli infiniti se i jolly sono troppo stretti
-    let coppieTrovateSet = new Set(); // Evita di mostrare lo stesso nome due volte
+    let massimoTentativi = 5000;
+    let coppieTrovateSet = new Set();
 
-    // Algoritmo ottimizzato a campionamento casuale
     while (resultsFound < numResults && tentativiFatti < massimoTentativi) {
         tentativiFatti++;
 
-        // Peschiamo un nome e un cognome a caso in modo ultrarapido
         let randomNome = listNomi[Math.floor(Math.random() * listNomi.length)];
         let randomCognome = listCognomi[Math.floor(Math.random() * listCognomi.length)];
         let stringaUnita = randomNome + randomCognome;
 
         let chiaveUnica = randomNome + "_" + randomCognome;
-        if (coppieTrovateSet.has(chiaveUnica)) continue; // Salta se l'abbiamo già generato in questo giro
+        if (coppieTrovateSet.has(chiaveUnica)) continue;
 
-        // Calcoliamo la distanza
         let differenze = calcolaDifferenze(rawInput, stringaUnita);
 
         if (differenze.totale <= maxJolly) {
