@@ -1,0 +1,11 @@
+body { font-family: Arial, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+.container { background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 800px; width: 100%; display: flex; overflow: hidden; }
+.input-section { padding: 30px; width: 40%; background-color: #ffffff; border-right: 1px solid #e0e0e0; }
+.results-section { padding: 30px; width: 60%; background-color: #f9fbfb; overflow-y: auto; max-height: 600px; }
+input, select, button { width: 100%; padding: 10px; margin: 10px 0 20px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+button { background-color: #4CAF50; color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+button:hover:not(:disabled) { background-color: #45a049; }
+button:disabled { background-color: #cccccc; cursor: not-allowed; }
+.generated-name { font-size: 1.4em; font-weight: bold; color: #2c3e50; padding: 10px; margin-bottom: 5px; background-color: white; border: 1px solid #dcdcdc; border-radius: 5px; }
+.match-details { font-size: 0.85em; color: #666; margin-bottom: 15px; padding-left: 10px; }
+h2 { margin-top: 0; color: #333; font-size: 1.5em; }
