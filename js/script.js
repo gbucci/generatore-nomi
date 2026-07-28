@@ -7,7 +7,6 @@ let database = {
 async function loadDatabase() {
     const btn = document.getElementById('searchBtn');
     try {
-        // Scarichiamo entrambi i file contemporaneamente per la massima velocità
         let [resIt, resEn] = await Promise.all([
             fetch('nomi_it.json'),
             fetch('nomi_en.json')
@@ -31,37 +30,49 @@ async function loadDatabase() {
 
 window.onload = loadDatabase;
 
+// Funzione rapida per contare le frequenze delle lettere
 function getLetterFrequencies(str) {
     let freq = {};
-    for (let char of str) {
+    for (let i = 0; i < str.length; i++) {
+        let char = str[i];
         freq[char] = (freq[char] || 0) + 1;
     }
     return freq;
 }
 
-function calcolaDifferenze(inputStr, targetStr) {
-    let inputFreq = getLetterFrequencies(inputStr);
+// Calcolo ottimizzato delle differenze
+function calcolaDifferenze(inputFreq, targetStr) {
     let targetFreq = getLetterFrequencies(targetStr);
-    
     let lettereDaAggiungere = 0;
     let lettereDaTogliere = 0;
 
+    // Controlliamo le lettere necessarie nel target rispetto all'input
     for (let char in targetFreq) {
         let necessarie = targetFreq[char];
         let disponibili = inputFreq[char] || 0;
-        if (necessarie > disponibili) lettereDaAggiungere += (necessarie - disponibili);
+        if (necessarie > disponibili) {
+            lettereDaAggiungere += (necessarie - disponibili);
+        }
     }
 
+    // Controlliamo le lettere in eccesso nell'input rispetto al target
     for (let char in inputFreq) {
         let disponibili = inputFreq[char];
         let necessarie = targetFreq[char] || 0;
-        if (disponibili > necessarie) lettereDaTogliere += (disponibili - necessarie);
+        if (disponibili > necessarie) {
+            lettereDaTogliere += (disponibili - necessarie);
+        }
     }
 
-    return { aggiunte: lettereDaAggiungere, rimozioni: lettereDaTogliere, totale: lettereDaAggiungere + lettereDaTogliere };
+    return lettereDaAggiungere + lettereDaTogliere;
 }
 
 function findRealNames() {
+    if (!database) {
+        alert("Il database non è ancora pronto!");
+        return;
+    }
+
     let rawInput = document.getElementById('inputStr').value.toLowerCase().replace(/\s/g, '');
     let maxJolly = parseInt(document.getElementById('maxJolly').value);
     let lang = document.getElementById('language').value;
@@ -90,24 +101,37 @@ function findRealNames() {
         return;
     }
 
+    // Ottimizzazione: pre-calcoliamo la frequenza dell'input una sola volta fuori dal ciclo
+    let inputFreq = getLetterFrequencies(rawInput);
+    let inputLength = rawInput.length;
+
+    // Filtriamo preventivamente le liste per evitare combinazioni con lunghezze assurde
+    // Teniamo solo i nomi/cognomi la cui lunghezza combinata non si discosta troppo dall'input + jolly
+    let nomiFiltrati = listNomi.filter(n => Math.abs(n.length - (inputLength / 2)) <= maxJolly + 4);
+    let cognomiFiltrati = listCognomi.filter(c => Math.abs(c.length - (inputLength / 2)) <= maxJolly + 4);
+
+    // Se il filtro è stato troppo restrittivo, usiamo le liste originali come fallback
+    if (nomiFiltrati.length === 0) nomiFiltrati = listNomi;
+    if (cognomiFiltrati.length === 0) cognomiFiltrati = listCognomi;
+
     let resultsFound = 0;
     let tentativiFatti = 0;
-    let massimoTentativi = 5000;
+    let massimoTentativi = 4000;
     let coppieTrovateSet = new Set();
 
     while (resultsFound < numResults && tentativiFatti < massimoTentativi) {
         tentativiFatti++;
 
-        let randomNome = listNomi[Math.floor(Math.random() * listNomi.length)];
-        let randomCognome = listCognomi[Math.floor(Math.random() * listCognomi.length)];
+        let randomNome = nomiFiltrati[Math.floor(Math.random() * nomiFiltrati.length)];
+        let randomCognome = cognomiFiltrati[Math.floor(Math.random() * cognomiFiltrati.length)];
         let stringaUnita = randomNome + randomCognome;
 
         let chiaveUnica = randomNome + "_" + randomCognome;
         if (coppieTrovateSet.has(chiaveUnica)) continue;
 
-        let differenze = calcolaDifferenze(rawInput, stringaUnita);
+        let totaleDifferenze = calcolaDifferenze(inputFreq, stringaUnita);
 
-        if (differenze.totale <= maxJolly) {
+        if (totaleDifferenze <= maxJolly) {
             coppieTrovateSet.add(chiaveUnica);
             resultsFound++;
 
@@ -120,7 +144,7 @@ function findRealNames() {
             
             let detailsBox = document.createElement('div');
             detailsBox.className = 'match-details';
-            detailsBox.innerText = `Jolly usati: ${differenze.totale} (+${differenze.aggiunte} lettere, -${differenze.rimozioni} lettere)`;
+            detailsBox.innerText = `Jolly usati: ${totaleDifferenze}`;
 
             resultListDiv.appendChild(nameBox);
             resultListDiv.appendChild(detailsBox);
@@ -129,10 +153,5 @@ function findRealNames() {
 
     if (resultsFound === 0) {
         resultListDiv.innerHTML = `<p style='color: orange;'>Nessun nome trovato con questi parametri. Prova ad aumentare i Jolly o a cambiare input!</p>`;
-    }
-}
-
-    if (resultsFound === 0) {
-        resultListDiv.innerHTML = `<p style='color: orange;'>Nessun nome trovato con questi parametri.</p>`;
     }
 }
